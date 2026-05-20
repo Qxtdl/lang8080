@@ -1,3 +1,4 @@
+#improper code
 .alabel      
 MOV a b
 XTHL

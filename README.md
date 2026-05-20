@@ -1,6 +1,6 @@
-# cm8080
+# lang8080
 
-A toolchain for the cm8080 arch (A binary compatible Intel 8080 Implementation.) \
+A toolchain for the 8080 architecture \
 `Including a assembler, and compiler for a custom language`
 
 > [!NOTE] 

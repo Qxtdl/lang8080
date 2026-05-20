@@ -1,2 +1,2 @@
-cd cm8080-as
+cd 8080-as
 make

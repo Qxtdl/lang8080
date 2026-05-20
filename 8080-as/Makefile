@@ -1,12 +1,13 @@
 SRC = src
 BUILD = build
-OUT = $(BUILD)/cm8080-as
-ARGS = example/1.asm
+NAME = 8080-as
+OUT = $(BUILD)/$(NAME)
+ARGS = example/1.asm $(BUILD)/out.bin
 
 COBJ = $(patsubst %.c,$(BUILD)/%.o,$(wildcard $(SRC)/*.c))
 
 CC = cc
-CFLAGS = -Iinclude -Wall
+CFLAGS = -g -Iinclude -Wall
 
 all: clean $(OUT) run
 
@@ -19,6 +20,7 @@ run: $(OUT)
 
 $(OUT): $(COBJ)
 	$(CC) $(CFLAGS) -o $(OUT) $(COBJ) $(LIBS)
+	sudo cp $(OUT) /usr/bin/$(NAME)
 
 $(BUILD)/%.o : %.c
 	@mkdir -p $(dir $@)

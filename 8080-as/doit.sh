@@ -1,0 +1,1 @@
+make run && cm2-riscv-emulator 8080 build/out.bin

@@ -1,5 +1,40 @@
 #pragma once
 
+#include <stdint.h>
+
+typedef struct {
+    const char *name;
+    enum RegType {
+        RT_RP, // register pair
+        RT_STACK_RP,
+        RT_REGISTER
+    } type;
+    int id;
+} reg_t;
+
+#define reg(name, regtype, id) \
+    { \
+        #name, \
+        regtype, \
+        id \
+    },
+
+static const reg_t regs[] = {
+    reg(b, RT_REGISTER, 0)
+    reg(c, RT_REGISTER, 1)
+    reg(d, RT_REGISTER, 2)
+    reg(e, RT_REGISTER, 3)
+    reg(h, RT_REGISTER, 4)
+    reg(l, RT_REGISTER, 5)
+    reg(m, RT_REGISTER, 6)
+    reg(a, RT_REGISTER, 7)
+    reg(bc, RT_RP, 0)
+    reg(de, RT_RP, 1)
+    reg(hl, RT_RP, 2)
+    reg(sp, RT_RP, 3)
+    reg(psw, RT_STACK_RP, 3)
+};
+
 typedef struct {
     const char *name;
     enum Opcode {
@@ -88,10 +123,14 @@ typedef struct {
         O_DI =    0b11110011,
         O_SPHL =  0b11111001,
         O_EI =    0b11111011,
+
+        O_DB = 0xdeadc0de, // define byte
+        O_INVALID = 0xdeadbeef
     } op;
     enum OperandType {
         OT_NONE,
         OT_RP,
+        OT_STACK_RP,
         OT_DEST_REG,
         OT_DEST_REG_SRC_REG,
         OT_SRC_REG,
@@ -100,8 +139,13 @@ typedef struct {
     enum ExtraBytes {
         EB_NONE,
         EB_BYTE,
-        EB_WORD
+        EB_WORD,
+        EB_BRANCH = EB_WORD
     } eb;
+    int operands_size;
+    reg_t operands[2];
+    uint8_t byte_imm;
+    uint16_t word_imm;
 } instruction_t;
 
 #define inst(name, operand_type, extrabytes) \
@@ -153,36 +197,36 @@ static const instruction_t instructions[] = {
     inst(RPE, OT_NONE, EB_NONE)
     inst(RP , OT_NONE, EB_NONE)
     inst(RM , OT_NONE, EB_NONE)
-    inst(POP, OT_NONE, EB_NONE)
-    inst(JC , OT_NONE, EB_NONE)
-    inst(JNC, OT_NONE, EB_NONE)
-    inst(JZ , OT_NONE, EB_NONE)
-    inst(JNZ, OT_NONE, EB_NONE)
-    inst(JM , OT_NONE, EB_NONE)
-    inst(JP , OT_NONE, EB_NONE)
-    inst(JPE, OT_NONE, EB_NONE)
-    inst(JPO, OT_NONE, EB_NONE)
-    inst(JMP, OT_NONE, EB_NONE) 
-    inst(CC, OT_NONE, EB_WORD)
-    inst(CNC, OT_NONE, EB_WORD)
-    inst(CZ, OT_NONE, EB_WORD)
-    inst(CNZ, OT_NONE, EB_WORD)
-    inst(CM, OT_NONE, EB_WORD)
-    inst(CP, OT_NONE, EB_WORD)
-    inst(CPE, OT_NONE, EB_WORD)
-    inst(CPO, OT_NONE, EB_WORD)
+    inst(POP, OT_RP, EB_NONE)
+    inst(JC , OT_NONE, EB_BRANCH)
+    inst(JNC, OT_NONE, EB_BRANCH)
+    inst(JZ , OT_NONE, EB_BRANCH)
+    inst(JNZ, OT_NONE, EB_BRANCH)
+    inst(JM , OT_NONE, EB_BRANCH)
+    inst(JP , OT_NONE, EB_BRANCH)
+    inst(JPE, OT_NONE, EB_BRANCH)
+    inst(JPO, OT_NONE, EB_BRANCH)
+    inst(JMP, OT_NONE, EB_BRANCH) 
+    inst(CC, OT_NONE, EB_BRANCH)
+    inst(CNC, OT_NONE, EB_BRANCH)
+    inst(CZ, OT_NONE, EB_BRANCH)
+    inst(CNZ, OT_NONE, EB_BRANCH)
+    inst(CM, OT_NONE, EB_BRANCH)
+    inst(CP, OT_NONE, EB_BRANCH)
+    inst(CPE, OT_NONE, EB_BRANCH)
+    inst(CPO, OT_NONE, EB_BRANCH)
     inst(PUSH, OT_RP, EB_NONE)
-    inst(ADI, OT_SRC_REG, EB_WORD)
-    inst(ACI, OT_SRC_REG, EB_WORD)
-    inst(SUI, OT_SRC_REG, EB_WORD)
-    inst(SBI, OT_SRC_REG, EB_WORD)
-    inst(ANI, OT_SRC_REG, EB_WORD)
-    inst(XRI, OT_SRC_REG, EB_WORD)
-    inst(ORI, OT_SRC_REG, EB_WORD)
-    inst(CPI, OT_SRC_REG, EB_WORD)
+    inst(ADI, OT_SRC_REG, EB_BYTE)
+    inst(ACI, OT_SRC_REG, EB_BYTE)
+    inst(SUI, OT_SRC_REG, EB_BYTE)
+    inst(SBI, OT_SRC_REG, EB_BYTE)
+    inst(ANI, OT_SRC_REG, EB_BYTE)
+    inst(XRI, OT_SRC_REG, EB_BYTE)
+    inst(ORI, OT_SRC_REG, EB_BYTE)
+    inst(CPI, OT_SRC_REG, EB_BYTE)
     inst(RST, OT_INLINE_IMM, EB_NONE)
     inst(RET, OT_NONE, EB_NONE)
-    inst(CALL, OT_NONE, EB_WORD)
+    inst(CALL, OT_NONE, EB_BRANCH)
     inst(OUT, OT_NONE, EB_BYTE)
     inst(IN, OT_NONE, EB_BYTE)
     inst(XTHL, OT_NONE, EB_NONE)
@@ -191,32 +235,5 @@ static const instruction_t instructions[] = {
     inst(DI, OT_NONE, EB_NONE)
     inst(SPHL, OT_NONE, EB_NONE)
     inst(EI, OT_NONE, EB_NONE)
-};
-
-typedef struct {
-    const char *name;
-    enum RegType {
-        RT_RP, // register pair
-        RT_REGISTER
-    } type;
-    int id;
-} _register_t;
-
-#define reg(name, regtype) \
-    { \
-        #name, \
-        regtype, \
-    },
-
-static const _register_t _registers[] = {
-    reg(a, RT_REGISTER)
-    reg(b, RT_REGISTER)
-    reg(c, RT_REGISTER)
-    reg(d, RT_REGISTER)
-    reg(e, RT_REGISTER)
-    reg(h, RT_REGISTER)
-    reg(l, RT_REGISTER)    
-    reg(bc, RT_RP)
-    reg(de, RT_RP)
-    reg(hl, RT_RP)    
+    inst(DB, OT_NONE, EB_BYTE)
 };
