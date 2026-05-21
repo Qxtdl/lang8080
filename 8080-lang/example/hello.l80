@@ -1,0 +1,9 @@
+fn bdose(void) void at 5;
+
+fn test (void) void {
+
+}
+
+fn main (byte ch, word x) void {
+    word var;
+}

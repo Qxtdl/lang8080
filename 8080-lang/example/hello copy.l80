@@ -1,0 +1,38 @@
+fn bdose(void) void at 0x5;
+
+fn main(void) void {
+    print(0xa8d3); // random string at a8d3
+}
+
+fn out(byte port, byte value) void {
+    asm out { // "out" is the location of the asm instruction
+        OUT 0
+    }
+    word ptr = out;
+    ptr = ptr + 1;
+    *ptr = value;
+}
+
+fn print(word text) void {
+loop:
+    byte ch = *text;
+    if (ch == 0) {
+        return;
+    }
+    out(0, ch)
+    text = text + 1;
+    goto loop;
+}
+
+/*
+        .main
+            LXI hl 43219
+            PUSH hl
+            CALL print
+            RET
+        .print
+            POP hl
+            PUSH hl
+            MOV b m
+            
+*/
