@@ -8,8 +8,10 @@ typedef struct {
 } virtual_reg_t;
 
 enum VirtualRegId {
-	VIRTUAL_REG_SP
+	VIRTUAL_REG_ID_SP
 };
+
+#define VIRTUAL_REG_SP ((virtual_reg_t){.id = VIRTUAL_REG_ID_SP})
 
 extern virtual_reg_t recent_reg;
 
