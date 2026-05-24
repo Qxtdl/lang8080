@@ -5,5 +5,6 @@ fn test (void) void {
 }
 
 fn main (byte ch, word x) void {
-    word var;
+	byte y = 5;
+    word var = 2930;
 }

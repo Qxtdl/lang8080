@@ -14,7 +14,7 @@ ast_node_t *ast_node_insert(ast_node_ptr_t *node, ast_node_t *child) {
 }
 
 ast_node_t *ast_walk(ast_node_ptr_t *parent) {
-    if (++parent->walked >= parent->size) 
+    if (parent->walked++ >= parent->size) 
         return NULL;
     return parent->ptrs[parent->walked - 1];
 }

@@ -16,7 +16,10 @@ typedef struct ast_node {
         TYPE_BODY,
         TYPE_FUNCTION,
         TYPE_FUNCTION_ARG,
-        TYPE_VARIABLE
+        TYPE_VARIABLE_DECLARATION,
+        TYPE_IDENTIFIER,
+        TYPE_NUMBER,
+        TYPE_OPERATOR
     } type;
     union {
         struct {
@@ -37,7 +40,17 @@ typedef struct ast_node {
         struct {
             const char *name;
             enum Token type;
-        } variable;
+            ast_node_ptr_t expr;
+        } variable_declaration;
+        struct {
+        	const char *name;
+        } identifier;
+        struct {
+        	int value;
+        } number;
+        struct {
+        	const char *name;
+        } operator;
     } data;
 } ast_node_t;
 
