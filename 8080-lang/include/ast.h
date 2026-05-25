@@ -50,6 +50,7 @@ typedef struct ast_node {
         } number;
         struct {
         	const char *name;
+        	enum Token type;
         } operator;
     } data;
 } ast_node_t;

@@ -27,6 +27,7 @@ static ast_node_t *parse_expression(ast_node_ptr_t *expr) {
 				printf("a operator %s\n", token->name);
 				node = ast_node_create(TYPE_OPERATOR);
 				node->data.operator.name = token->name;
+				node->data.operator.type = token->type;
 				break;
 			case TOKEN_SEMICOLON:
 				goto done;			
